@@ -1,4 +1,6 @@
 #!/bin/bash
+# Author: Ashkan Kiani
+# Version: 0.1.1
 CYAN="\033[0;36m"
 RED="\033[0;31m"
 BLUE="\033[0;34m"

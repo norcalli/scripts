@@ -1,0 +1,197 @@
+#!/bin/bash
+# Author:    Rainer Mueller <raimue@codingfarm.de>
+# Version:   1.6
+# License:   Public Domain
+
+usage() {
+    cat <<END
+Usage: $argv0 [options] [files...]
+
+Options:
+    -h, --help          display this help
+    -l, --lang <lang>   set language of the paste
+    -p, --private       make paste private
+
+If --lang is not specified, this script will try to determine the type of each
+file automatically based on the extension. If no files are given on the
+command line it reads from standard input.
+END
+}
+
+map-lang() {
+    local file="$1"
+    local ext=${file##*.}
+    local lang=""
+
+    # Based on file name
+    case $ext in
+        css|d|diff|go|ini|io|java|lisp|lua|nu|php|scala|sql|tex)
+            lang=$ext
+            ;;
+        as)
+            lang=actionscript
+            ;;
+        c|cpp|cc|cxx|h|hpp|hh|hxx)
+            lang=c++
+            ;;
+        clj)
+            lang=clojure
+            ;;
+        conf)
+            lang=apache
+            ;;
+        cs)
+            lang=csharp
+            ;;
+        erb|rhtml)
+            lang=html_rails
+            ;;
+        erl)
+            lang=erlang
+            ;;
+        f|for|f90|f95)
+            lang=fortran
+            ;;
+        js)
+            lang=javascript
+            ;;
+        htm|html|xml)
+            lang=html
+            ;;
+        hs)
+            lang=haskell
+            ;;
+        lhs)
+            lang=literate_haskell
+            ;;
+        m|mm)
+            lang=objective-c++
+            ;;
+        Makefile|makefile|GNUmakefile)
+            lang=makefile
+            ;;
+        py)
+            lang=python
+            ;;
+        pas)
+            lang=pascal
+            ;;
+        pl)
+            lang=perl
+            ;;
+        rb)
+            lang=ruby_on_rails
+            ;;
+        scm|ss)
+            lang=scheme
+            ;;
+        *sh)
+            lang=shell-unix-generic
+            ;;
+        tpl)
+            lang=smarty
+            ;;
+        yaml|yml)
+            lang=yaml
+            ;;
+    esac
+
+    if [ "$lang" != "" ]; then
+        echo $lang
+        return
+    fi
+
+    # Executable files are usually shell scripts (who would pastie a binary?)
+    if [ -x "$file" ]; then
+        echo shell-unix-generic
+        return
+    fi
+}
+
+# default settings
+private=1
+lang="auto"
+file="-"
+files=()
+
+# save name of the script
+argv0=$(basename $0)
+
+test $# -gt 0 || { usage; exit 1; }
+
+# parse arguments
+while [ $# -gt 0 ]; do
+    case $1 in
+        -h|--help)
+            usage
+            exit 1
+            ;;
+        -l|--lang)
+            shift
+            lang=$1
+            ;;
+        -p|--private)
+            private=1
+            ;;
+        *)
+            # Everything else is a file
+            files=( ${files[@]} $1 )
+            ;;
+    esac
+    shift
+done
+
+# read files
+if [ ${#files[@]} -gt 0 ]; then
+    # Create temporary file
+    tmpfile=$(mktemp -t $argv0.XXXXX)
+    trap "rm -f $tmpfile" EXIT
+
+    for f in ${files[@]}; do
+        if [ ! -r "$f" ]; then
+            echo "$f: cannot read file" >&2
+            exit 1
+        fi
+        if [ ! -f "$f" ]; then
+            echo "$f: not a regular file" >&2
+            exit 1
+        fi
+        if [ "$lang" == "auto" ]; then
+            flang=$(map-lang "$f")
+        fi
+        if [ ${#files[@]} -gt 1 ]; then
+            if [ -z "$flang" ]; then
+                echo "## $f" >> $tmpfile
+            else
+                echo "## $f [$flang]" >> $tmpfile
+            fi
+        else
+            if [ "$lang" == "auto" ]; then
+                lang=$flang
+            fi
+        fi
+        cat $f >> $tmpfile
+    done
+    file="$tmpfile"
+fi
+
+# pastie now!
+
+if [ "$lang" == "auto" ]; then
+    lang="plain_text"
+fi
+
+auth='burger'
+# Enable this in case the authorization token ever changes
+#REGEX="\$('paste_authorization')\.value='\(.*\)';"
+#auth=$(curl -s -L http://pastie.org/pastes/new \
+#        | sed -e "/$REGEX/!d" -e "/$REGEX/s/$REGEX/\1/")
+
+url=$(curl http://pastie.org/pastes \
+    -F "paste[parser]=$lang" \
+    -F "paste[body]=<$file" \
+    -F "paste[restricted]=$private" \
+    -F "paste[authorization]=$auth" \
+    -s -L -o /dev/null -w "%{url_effective}")
+
+echo "$url"
