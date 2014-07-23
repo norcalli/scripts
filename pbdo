@@ -1,0 +1,27 @@
+#!/bin/bash
+CYAN="\033[0;36m"
+RED="\033[0;31m"
+BLUE="\033[0;34m"
+NO_COLOUR="\033[0m"
+
+content="$(pbpaste)"
+
+isGitURL() {
+  echo "$1" | grep -E 'github\.com|\.git$' >/dev/null
+}
+Message() {
+  echo -e "$BLUE${*}$NO_COLOUR" >&2
+}
+
+# Run git clone for git urls.
+# TODO: test for proper url format.
+isGitURL "$content" && {
+  Message "Github url; cloning:"
+  git clone "$content"
+  exit $?
+}
+
+# Default action is just to echo
+Message "Default action (echo):"
+echo "$content"
+
