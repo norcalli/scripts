@@ -1,6 +1,12 @@
 #!/bin/bash
 # Author: Ashkan Kiani
 # Version: 0.1.1
+# Description: Runs actions based on your clipboard using pbpaste
+
+# Plans:
+# - Allow specifying actions with a parameter (-a action)
+# - Improve auto detecting the action
+# - Dance.
 CYAN="\033[0;36m"
 RED="\033[0;31m"
 BLUE="\033[0;34m"
