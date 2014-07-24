@@ -1,6 +1,6 @@
 #!/bin/bash
 # Author: Ashkan Kiani
-# Version: 0.1.1
+# Version: 0.1.2
 # Description: Runs actions based on your clipboard using pbpaste
 
 # Plans:
@@ -14,8 +14,11 @@ NO_COLOUR="\033[0m"
 
 content="$(pbpaste)"
 
+matches() {
+  echo "$1" | grep -E "$2" >/dev/null
+}
 isGitURL() {
-  echo "$1" | grep -E 'github\.com|\.git$' >/dev/null
+  matches "$1" 'github\.com|\.git$'
 }
 Message() {
   echo -e "$BLUE${*}$NO_COLOUR" >&2
@@ -25,8 +28,15 @@ Message() {
 # TODO: test for proper url format.
 isGitURL "$content" && {
   Message "Github url; cloning:"
+  if matches "$1" "vim"; then
+    pushd ~/.vim/bundle
+  else
+    pushd .
+  fi
+
   git clone "$content"
   exit $?
+  popd
 }
 
 # Default action is just to echo
