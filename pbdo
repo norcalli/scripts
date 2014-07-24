@@ -1,6 +1,6 @@
 #!/bin/bash
 # Author: Ashkan Kiani
-# Version: 0.1.2
+# Version: 0.1.3
 # Description: Runs actions based on your clipboard using pbpaste
 
 # Plans:
@@ -28,15 +28,15 @@ Message() {
 # TODO: test for proper url format.
 isGitURL "$content" && {
   Message "Github url; cloning:"
-  if matches "$1" "vim"; then
+  if matches "$content" "vim"; then
     pushd ~/.vim/bundle
   else
     pushd .
   fi
 
   git clone "$content"
-  exit $?
   popd
+  exit $?
 }
 
 # Default action is just to echo
