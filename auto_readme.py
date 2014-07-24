@@ -28,7 +28,7 @@ def parseLine(line):
 def UpdateDescriptions(d):
   lines = []
   with open('./README.md') as file:
-    lines = [line.strip() for line in file.readlines()]
+    lines = [line.rstrip() for line in file.readlines()]
   idx = 0
   for line in lines:
     if 'Descriptions' in line:
