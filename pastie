@@ -2,6 +2,7 @@
 # Author:    Rainer Mueller <raimue@codingfarm.de>
 # Version:   1.6
 # License:   Public Domain
+# Description: Posts a file to pastie from the command line.
 
 usage() {
     cat <<END

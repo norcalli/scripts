@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 import os
+import sys
 import re
 # Author: Ashkan Kiani
 # Version: 0.1
@@ -20,7 +21,7 @@ def parseLine(line):
   try:
     return lineRegex.findall(line)[0]
   except IndexError:
-    print(line)
+    print(line, file=sys.stderr)
     return ('', '')
 
 
@@ -43,8 +44,10 @@ def UpdateDescriptions(d):
     descDict[info[0]] = info[1]
   descDict.update(d)
   descriptions = [formatDescription(name, description) for name, description in descDict.items()]
+  print("Descriptions:", file=sys.stderr)
   for name, desc in descDict.items():
-    print("{}: {}".format(name, desc))
+    print("{}: {}".format(name, desc), file=sys.stderr)
+  print("", file=sys.stderr)
   with open('./README.md', 'w') as file:
     file.writelines(line + "\n" for line in header + descriptions)
 
