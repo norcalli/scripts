@@ -1,6 +1,6 @@
 #!/bin/bash
 # Author: Ashkan Kiani
-# Version: 0.1.3
+# Version: 0.1.4
 # Description: Runs actions based on your clipboard using pbpaste
 
 # Plans:
@@ -35,8 +35,9 @@ isGitURL "$content" && {
   fi
 
   git clone "$content"
+  status=$?
   popd
-  exit $?
+  exit $status
 }
 
 # Default action is just to echo
