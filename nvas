@@ -23,6 +23,6 @@ def openFiles():
     # To escape terminal mode. Not sure if bug.
     nvim.feedkeys('', "n")
     for x in args:
-        nvim.command("e {}".format(normalizePath(x)))
+        nvim.command("drop {}".format(normalizePath(x)))
 
 openFiles()
