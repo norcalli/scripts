@@ -7,9 +7,9 @@
  _____| ||     |_ |   |  | ||   | |   |      |   |   _____| |
 |_______||_______||___|  |_||___| |___|      |___|  |_______|
 ```
-####Some scripts. That's it.
+#### Some scripts. That's it.
 
-####Descriptions:
+#### Descriptions:
 - `pbdo`: Runs actions based on your clipboard using pbpaste
 - `pastie`: Posts a file to pastie from the command line.
 - `auto_readme.py`: Automatically generates the descriptions in this README.md by parsing scripts for "Description: *" line
