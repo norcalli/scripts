@@ -1,0 +1,79 @@
+#!/bin/sh
+# Description: Wrapper script around yay to try to ignore errors.
+# Copyright © 2019 Ashkan Kiani
+
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+
+lightred() { echo -e "\033[1;31m$*\033[0m"; }
+blue() { echo -e "\033[1;34m$*\033[0m"; }
+dump() { echo "$0: $*" >&2; }
+say() { echo "$0: $(blue "$*")" >&2; }
+yell() { echo "$0: $(lightred "$*")" >&2; }
+die() { yell "$*"; exit 111; }
+try() { "$@" || die "cannot $*"; }
+asuser() { sudo su - "$1" -c "${*:2}"; }
+need_var() { test -n "${!1}" || die "$1 must be defined"; }
+need_vars() { for var in "$@"; do need_var $var; done; }
+has_bin() { which "$1" 2>&1 >/dev/null; }
+need_exe() { has_bin "$1"|| die "'$1' not found in PATH"; }
+need_bin() { need_exe "$1"; }
+strictmode() { set -eo pipefail; }
+nostrictmode() { set +eo pipefail; }
+
+export SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+
+strictmode
+
+test "$1" = "--help" && {
+	echo "Usage: $0 <package-to-ignore...>" >&2
+	exit 1
+}
+
+strip_color_codes() {
+	sed 's/\e\[[\d;]*m//g;'
+}
+
+cd $(mktemp -d /tmp/tmp.XXXXXX)
+
+IGNORES=dummypackage
+
+for PACKAGE in "$@"; do
+	IGNORES=$IGNORES,$PACKAGE
+done
+
+for ITERATION in $(seq 1 10); do
+	LOG_FILE=run-$ITERATION.log
+	nostrictmode
+	{
+		yay -Syu --devel --ignore $IGNORES && exit 0
+	} | tee $LOG_FILE
+	strictmode
+	say $PWD/$LOG_FILE
+	say $(tail -n1 $LOG_FILE)
+	case $(tail -n1 $LOG_FILE) in
+		Error\ downloading\ sources:\ *)
+			IGNORES=$IGNORES,$(tail -n1 $LOG_FILE | grep -o '[^ ]*$' | strip_color_codes)
+			yell $IGNORES
+			;;
+		Error\ making:\ *)
+			IGNORES=$IGNORES,$(tail -n1 $LOG_FILE | grep -o '[^ ]*$' | strip_color_codes)
+			yell $IGNORES
+			;;
+		*)
+			exit 1
+			;;
+	esac
+done
+
