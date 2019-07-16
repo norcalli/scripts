@@ -1,10 +1,12 @@
 #!/usr/bin/env python
 from neovim import attach
-import os, sys
+import os
+import sys
+import os.path
 
 args = sys.argv[1:]
 if not args:
-    print "Usage: {} <filename> ...".format(sys.argv[0])
+    print("Usage: {} <filename> ...".format(sys.argv[0]))
     sys.exit(1)
 
 addr = os.environ["NVIM_LISTEN_ADDRESS"]
@@ -12,17 +14,25 @@ if not addr:
     # TODO: Open a new nvim instance if no addr
     sys.exit(2)
 
-import os.path
-
-import thread
 nvim = attach("socket", path=addr)
+
 def normalizePath(name):
     return os.path.abspath(name).replace(" ", "\\ ")
+
+def request_callback(*args):
+    return
+
+def notification_callback(event_type, *args):
+    if 'nvim_buf_detach_event' == event_type:
+        nvim.stop_loop()
 
 def openFiles():
     # To escape terminal mode. Not sure if bug.
     nvim.feedkeys('', "n")
     for x in args:
         nvim.command("drop {}".format(normalizePath(x)))
+        nvim.current.buffer.api.attach(True, {})
+        nvim.run_loop(request_callback, notification_callback)
+
 
 openFiles()
