@@ -32,8 +32,8 @@ def get_help_text(script_file_name):
 		result = subprocess.run(["timeout", "-sKILL", "0.01", script_file_name, "--help"], capture_output=True)
 		help_text = result.stderr.decode("utf-8")
 		# If it doesn't start with "usage:" then it ain't kosher
-		if not help_text.lower().startswith("usage:"):
-				print(script_file_name, "invalid help text, skipping.", help_text)
+		if not help_text.lower().lstrip("\n").startswith("usage:"):
+				print(script_file_name, "invalid help text, skipping.", help_text, file=sys.stderr)
 				return None
 		return help_text
 

@@ -21,6 +21,9 @@ Wrapper script around yay to try to ignore errors.
 ```sh
 Usage: ./yay-update-ignore-errors <package-to-ignore...>
 
+This script will run 'yay' and ignore any package that
+fails by pattern matching against the errors.
+
 Options:
 <package-to-ignore...> 		list of comma separated lists (so you can do either)
 --help 				Print this help message
@@ -29,6 +32,11 @@ Examples:
 	# The following are equivalent
 	./yay-update-ignore-errors qemu,bluez-utils linux linux-headers
 	./yay-update-ignore-errors qemu,bluez-utils,linux,linux-headers
+
+	# Auto upgrade
+	yes '' | ./yay-update-ignore-errors
+	# Auto upgrade everything except linux
+	yes '' | ./yay-update-ignore-errors linux
 
 ```
 

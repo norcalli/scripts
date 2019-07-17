@@ -40,6 +40,9 @@ test "$1" = "--help" && {
 	cat >&2 <<EOF
 Usage: $0 <package-to-ignore...>
 
+This script will run 'yay' and ignore any package that
+fails by pattern matching against the errors.
+
 Options:
 <package-to-ignore...> 		list of comma separated lists (so you can do either)
 --help 				Print this help message
@@ -48,6 +51,11 @@ Examples:
 	# The following are equivalent
 	$0 qemu,bluez-utils linux linux-headers
 	$0 qemu,bluez-utils,linux,linux-headers
+
+	# Auto upgrade
+	yes '' | $0
+	# Auto upgrade everything except linux
+	yes '' | $0 linux
 EOF
 	exit 1
 }
