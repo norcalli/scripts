@@ -16,16 +16,17 @@ always up to date.
 ##### `newest-file`
 Prints the newest file whose filename matches a regex at a path
 ```sh
-Usage: ./newest-file <path-expression> [<finder=auto>]
+Usage: ./newest-file <path-expression> [<N>] [<finder=auto>]
 
 Print the newest file by modification time which matches the regex
 <path-expression>. The regex only applies to the basename of the file. The
 path is taken as-is.
 
 Options:
-	<path-expression> 		Regex xpression passed to finder
-	[<finder=fd>] 			Which finder to use.
-					    Supported: auto, find, fd
+	<path-expression> 	Regex xpression passed to finder
+	[<N>] 			N >= 1. Nth newest file
+	[<finder=fd>] 		Which finder to use.
+				    Supported: auto, find, fd
 Examples:
 	./newest-file '/run/user/1000/sway-ipc.*.sock'
 
@@ -64,16 +65,17 @@ Examples:
 ##### `oldest-file`
 Prints the oldest file whose filename matches a regex at a path
 ```sh
-Usage: ./oldest-file <path-expression> [<finder=auto>]
+Usage: ./oldest-file <path-expression> [<N>] [<finder=auto>]
 
 Print the oldest file by modification time which matches the regex
 <path-expression>. The regex only applies to the basename of the file. The
 path is taken as-is.
 
 Options:
-	<path-expression> 		Regex xpression passed to finder
-	[<finder=fd>] 			Which finder to use.
-					    Supported: auto, find, fd
+	<path-expression> 	Regex xpression passed to finder
+	[<N>] 			N >= 1. Nth oldest file
+	[<finder=fd>] 		Which finder to use.
+				    Supported: auto, find, fd
 Examples:
 	./oldest-file '/run/user/1000/sway-ipc.*.sock'
 

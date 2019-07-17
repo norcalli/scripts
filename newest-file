@@ -20,16 +20,17 @@ export SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 
 usage() {
 	cat >&2 <<EOF
-Usage: $0 <path-expression> [<finder=auto>]
+Usage: $0 <path-expression> [<N>] [<finder=auto>]
 
 Print the newest file by modification time which matches the regex
 <path-expression>. The regex only applies to the basename of the file. The
 path is taken as-is.
 
 Options:
-	<path-expression> 		Regex xpression passed to finder
-	[<finder=fd>] 			Which finder to use.
-					    Supported: auto, find, fd
+	<path-expression> 	Regex xpression passed to finder
+	[<N>] 			N >= 1. Nth newest file
+	[<finder=fd>] 		Which finder to use.
+				    Supported: auto, find, fd
 Examples:
 	$0 '/run/user/1000/sway-ipc.*.sock'
 EOF
@@ -54,8 +55,7 @@ finder_find() {
 	find "$(dirname "$1")" -maxdepth 1 -type f -printf "%Ts\\\t%p\n" | grep "$1"
 }
 
-# case "${2-fd}" in
-case "${2-auto}" in
+case "${3-find}" in
 	auto)
 		# has_bin fd && finder_fd "$1" || finder_find "$1"
 		finder_find "$1" # is faster sometimes because timestamp print is built in
@@ -68,6 +68,6 @@ case "${2-auto}" in
 		finder_find "$1"
 		;;
 	*)
-		echo "${2} Invalid finder" >&2
+		echo "${3} Invalid finder" >&2
 		usage
-esac | sort -k1,1n | sed -n \$p | cut -d\t -f2-
+esac | sort -k1,1nr | sed -n ${2:-1}p | cut -d\t -f2-
