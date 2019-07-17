@@ -18,8 +18,9 @@ Prints the newest file whose filename matches a regex at a path
 ```sh
 Usage: ./newest-file <path-expression> [<finder=auto>]
 
-The regex only applies to the basename of the file.
-The path is taken as-is.
+Print the newest file by modification time which matches the regex
+<path-expression>. The regex only applies to the basename of the file. The
+path is taken as-is.
 
 Options:
 	<path-expression> 		Regex xpression passed to finder
