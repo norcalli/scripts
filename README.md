@@ -9,6 +9,9 @@
 ```
 #### Some scripts. That's it.
 
+These descriptions will be auto generated (when possible), and so are
+always up to date.
+
 #### Descriptions:
 ##### `pastie`
 Posts a file to pastie from the command line.
