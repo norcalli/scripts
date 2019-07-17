@@ -13,6 +13,23 @@ These descriptions will be auto generated (when possible), and so are
 always up to date.
 
 #### Descriptions:
+##### `newest-file`
+Prints the newest file whose filename matches a regex at a path
+```sh
+Usage: ./newest-file <path-expression> [<finder=auto>]
+
+The regex only applies to the basename of the file.
+The path is taken as-is.
+
+Options:
+	<path-expression> 		Regex xpression passed to finder
+	[<finder=fd>] 			Which finder to use.
+					    Supported: auto, find, fd
+Examples:
+	./newest-file '/run/user/1000/sway-ipc.*.sock'
+
+```
+
 ##### `pastie`
 Posts a file to pastie from the command line.
 

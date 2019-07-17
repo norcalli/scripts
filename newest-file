@@ -1,0 +1,72 @@
+#!/bin/sh
+# Description: Prints the newest file whose filename matches a regex at a path
+lightred() { echo -e "\033[1;31m$*\033[0m"; }
+blue() { echo -e "\033[1;34m$*\033[0m"; }
+dump() { echo "$0: $*" >&2; }
+say() { echo "$0: $(blue "$*")" >&2; }
+yell() { echo "$0: $(lightred "$*")" >&2; }
+die() { yell "$*"; exit 111; }
+try() { "$@" || die "cannot $*"; }
+asuser() { sudo su - "$1" -c "${*:2}"; }
+need_var() { test -n "${!1}" || die "$1 must be defined"; }
+need_vars() { for var in "$@"; do need_var $var; done; }
+has_bin() { which "$1" 2>&1 >/dev/null; }
+need_exe() { has_bin "$1"|| die "'$1' not found in PATH"; }
+need_bin() { need_exe "$1"; }
+strictmode() { set -eo pipefail; }
+nostrictmode() { set +eo pipefail; }
+
+export SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+
+usage() {
+	cat >&2 <<EOF
+Usage: $0 <path-expression> [<finder=auto>]
+
+The regex only applies to the basename of the file.
+The path is taken as-is.
+
+Options:
+	<path-expression> 		Regex xpression passed to finder
+	[<finder=fd>] 			Which finder to use.
+					    Supported: auto, find, fd
+Examples:
+	$0 '/run/user/1000/sway-ipc.*.sock'
+EOF
+	exit 1
+}
+
+test "$1" = --help && usage
+test -n "$1" || usage
+
+# Uses regex
+finder_fd() {
+	fd -d1 -p0 "$1" "$(dirname "$1")" | xargs -0 stat -c %Y\t%n
+}
+
+# Uses find's expression syntax with glob
+finder_find_glob() {
+	find "$(dirname "$1")" -maxdepth 1 -type f -wholename "$1" -printf "%Ts\\\t%p\n" 
+}
+
+# Uses grep for regex
+finder_find() {
+	find "$(dirname "$1")" -maxdepth 1 -type f -printf "%Ts\\\t%p\n" | grep "$1"
+}
+
+# case "${2-fd}" in
+case "${2-auto}" in
+	auto)
+		# has_bin fd && finder_fd "$1" || finder_find "$1"
+		finder_find "$1" # is faster sometimes because timestamp print is built in
+		;;
+	fd)
+		need_bin fd
+		finder_fd "$1"
+		;;
+	find)
+		finder_find "$1"
+		;;
+	*)
+		echo "${2} Invalid finder" >&2
+		usage
+esac | sort -k1,1n | sed -n \$p | cut -d\t -f2-
