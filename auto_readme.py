@@ -10,6 +10,7 @@ import re
 
 TITLE_HEADER_LEVEL = "####"
 SCRIPT_HEADER_LEVEL = TITLE_HEADER_LEVEL+"#"
+SCRIPT_NAME_REGEX = re.compile(SCRIPT_HEADER_LEVEL+' `([^`]+)`')
 
 
 def format_description(name, description, help_text):
@@ -30,12 +31,12 @@ def get_help_text(script_file_name):
 		import subprocess
 		result = subprocess.run(["timeout", "-sKILL", "0.01", script_file_name, "--help"], capture_output=True)
 		help_text = result.stderr.decode("utf-8")
+		# If it doesn't start with "usage:" then it ain't kosher
 		if not help_text.lower().startswith("usage:"):
 				print(script_file_name, "invalid help text, skipping.", help_text)
 				return None
 		return help_text
 
-SCRIPT_NAME_REGEX = re.compile(SCRIPT_HEADER_LEVEL+' `([^`]+)`')
 
 def parse_descriptions(lines):
 	description_dictionary = {}

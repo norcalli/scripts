@@ -21,6 +21,15 @@ Wrapper script around yay to try to ignore errors.
 ```sh
 Usage: ./yay-update-ignore-errors <package-to-ignore...>
 
+Options:
+<package-to-ignore...> 		list of comma separated lists (so you can do either)
+--help 				Print this help message
+
+Examples:
+	# The following are equivalent
+	./yay-update-ignore-errors qemu,bluez-utils linux linux-headers
+	./yay-update-ignore-errors qemu,bluez-utils,linux,linux-headers
+
 ```
 
 ##### `auto_readme.py`

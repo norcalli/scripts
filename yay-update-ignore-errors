@@ -37,7 +37,18 @@ export SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 strictmode
 
 test "$1" = "--help" && {
-	echo "Usage: $0 <package-to-ignore...>" >&2
+	cat >&2 <<EOF
+Usage: $0 <package-to-ignore...>
+
+Options:
+<package-to-ignore...> 		list of comma separated lists (so you can do either)
+--help 				Print this help message
+
+Examples:
+	# The following are equivalent
+	$0 qemu,bluez-utils linux linux-headers
+	$0 qemu,bluez-utils,linux,linux-headers
+EOF
 	exit 1
 }
 
