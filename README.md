@@ -61,6 +61,24 @@ Examples:
 
 ```
 
+##### `oldest-file`
+Prints the oldest file whose filename matches a regex at a path
+```sh
+Usage: ./oldest-file <path-expression> [<finder=auto>]
+
+Print the oldest file by modification time which matches the regex
+<path-expression>. The regex only applies to the basename of the file. The
+path is taken as-is.
+
+Options:
+	<path-expression> 		Regex xpression passed to finder
+	[<finder=fd>] 			Which finder to use.
+					    Supported: auto, find, fd
+Examples:
+	./oldest-file '/run/user/1000/sway-ipc.*.sock'
+
+```
+
 ##### `auto_readme.py`
 Automatically generates the descriptions in this README.md by parsing scripts for "Description: *" line
 
