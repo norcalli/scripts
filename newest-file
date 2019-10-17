@@ -52,7 +52,13 @@ finder_find_glob() {
 
 # Uses grep for regex
 finder_find() {
-	find "$(dirname "$1")" -maxdepth 1 -type f -printf "%Ts\\\t%p\n" | grep "$1"
+	DIR="$(dirname "$1")"
+	DEPTH=1
+	while ! test -d "$DIR"; do
+		DIR="$(dirname "$DIR")"
+		(( DEPTH += 1 ))
+	done
+	find "$DIR" -maxdepth $DEPTH -type f -printf "%Ts\\\t%p\n" | grep "$1"
 }
 
 case "${3-find}" in

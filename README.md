@@ -84,3 +84,18 @@ Examples:
 ##### `auto_readme.py`
 Automatically generates the descriptions in this README.md by parsing scripts for "Description: *" line
 
+##### `lua-nvim`
+Use nvim as if it was a luajit executable. REPL not supported currently
+```sh
+Usage: lua-nvim -e <CHUNK> [arg...]
+       lua-nvim <FILENAME> [arg...]
+
+The REPL is currently not supported.
+
+OPTIONS:
+	-e <CHUNK>	Execute CHUNK as a script
+	<FILENAME>	Execute FILENAME
+	[arg...]	Arguments to set on 'arg'
+
+```
+

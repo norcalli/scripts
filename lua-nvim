@@ -1,0 +1,52 @@
+#!/bin/sh
+# Description: Use nvim as if it was a luajit executable. REPL not supported currently
+
+args() {
+	echo "+lua arg = {[0]=[=[${ARG0-$0}]=]}"
+	for i in "$@"; do
+		echo "+lua table.insert(arg, [===[$i]===])"
+	done
+}
+
+usage() {
+	test -n "$1" && {
+		echo >&2 "$1"
+		echo >&2
+	}
+	cat >&2 <<EOF
+Usage: $(basename "$0") -e <CHUNK> [arg...]
+       $(basename "$0") <FILENAME> [arg...]
+
+The REPL is currently not supported.
+
+OPTIONS:
+	-e <CHUNK>	Execute CHUNK as a script
+	<FILENAME>	Execute FILENAME
+	[arg...]	Arguments to set on 'arg'
+EOF
+	exit 1
+}
+
+test "$1" = --help && usage
+test "$1" = -h && usage
+
+IFS="
+"
+
+test "$1" = "-e" && {
+	shift
+	SCRIPT="$1"
+	shift
+	# The difference here how to handle errors. -Es will silently fail, but
+	# -E will drop into Ex mode.
+	# TODO make this an option that can be set
+	exec nvim -u NONE -i NONE -E -R --headless $(args "$@") +"lua $SCRIPT" -cq
+	#exec nvim -u NONE -i NONE -Es -R --headless $(args "$@") -cq
+}
+
+test -f "$1" || usage "'$1' doesn't exist."
+FILENAME="$1"
+shift
+exec nvim -u NONE -i NONE -E -R --headless $(args "$@") +"luafile $FILENAME" -cq
+#exec nvim -u NONE -i NONE -Es -R --headless $(args "$@") -cq
+
